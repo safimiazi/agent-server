@@ -14,10 +14,10 @@ app.use(router)
 
 
 // connection database here 
-
 app.get("/health",(req,res)=>{
     res.send('life drop server is running')
 })
+
 
 app.all('*',(req,res,next)=>{
     const error = new Error(`can't find ${req.originalUrl}on the server`)
