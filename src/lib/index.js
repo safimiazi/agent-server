@@ -1,11 +1,12 @@
 
-const getDataUser = async(name)=>{
+const getDataformuser = async(name) =>{
     try{
-        return {message:`Hello i am comming to you very fastly ${name}`}
+        return{message:`Hey , How are your ${name}`}
+
     }catch(error){
         console.log(error);
     }
 }
 
 
-module.exports = {getDataUser}
+module.exports = {getDataformuser}
