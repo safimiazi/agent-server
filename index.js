@@ -15,7 +15,7 @@ app.use(router)
 
 // connection database here 
 app.get("/health",(req,res)=>{
-    res.send('life drop server is running')
+    res.send('Coin selling server is running')
 })
 
 
@@ -31,7 +31,7 @@ app.use(globalErrorHandler)
 const main = async () =>{
     await connectDB()
     app.listen(port,()=>{
-        console.log(`life drop server is running on port ${port}`);
+        console.log(`Coin selling server is running on port ${port}`);
     });
 }
 

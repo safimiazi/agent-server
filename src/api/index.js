@@ -1,23 +1,77 @@
 
-const { getDonorData } = require("../lib/users");
-const { getDataformuser } = require("../lib");
+const { saveClientData , getClientDataList,editeClientData } = require("../lib/users");
 
+// save clientDAta to database
+const ClientListItemAdd = async(req, res) =>{
+      try{
+        const result = await saveClientData( {
+            "UniqueID": "JD123",
+            "CustomerName": "John Doe",
+            "Type": "Regular",
+            "Condition": "Active",
+            "PointRate": 0.5
+          },)
 
-const exampleDataApi = async(req, res) =>{
-    // you  can call the function form the lib for logic here
-    console.log('reques accespt ',req.params.id);
-    const result = await getDataformuser(req.params.id)
-    res.send({message : 'this server is running...',result})
+        res.status(200).send({massage:'successfully send data ',result})
+
+      }catch(error){
+        res.send(error)
+      }
 } 
 
-const donourInfo = async(req,res)=>{
+// data get and search with pagination 
 
-    const queryValue = req.query
-   const result = await getDonorData(queryValue)
-    
-    console.log(result)
-   res.send(result)
-
+const getClientDataListAPI =async (req,res) => {
+      try{
+        const clientDataList  = await getClientDataList()
+        res.status(200).send({massage:'successfully edite data', clientDataList})
+      }catch(error){
+        return error
+      }
 }
 
-module.exports = {exampleDataApi,donourInfo}
+// eidte database client data 
+
+const editeClientDataAPI = async(req,res) =>{
+      try {
+        // Extract client ID from request parameters
+        const { clientId } = req.params;
+
+        // Extract updated data from request body
+        const newData = req.body;
+
+        // Update client data in the database
+        const updatedClient = await editeClientData(clientId, newData);
+
+        // Return updated client data as response
+        res.json(updatedClient);
+    } catch (error) {
+        // Handle errors
+        console.error('Error updating client data:', error);
+        res.status(500).json({ error: 'Failed to update client data' });
+    }
+}
+
+
+
+// Define the route handler for deleting client data
+const deleteClientData = async (req, res) => {
+  try {
+      // Extract client ID from request parameters
+      const { clientId } = req.params;
+
+      // Delete client data from the database
+      await deleteClient(clientId);
+
+      // Return success message as response
+      res.json({ message: 'Client data deleted successfully' });
+  } catch (error) {
+      // Handle errors
+      console.error('Error deleting client data:', error);
+      res.status(500).json({ error: 'Failed to delete client data' });
+  }
+};
+
+
+
+module.exports = {ClientListItemAdd,getClientDataListAPI,editeClientDataAPI , deleteClientData}

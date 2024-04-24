@@ -1,13 +1,22 @@
-const { exampleDataApi, donourInfo } = require('../api')
+const { ClientListItemAdd ,getClientDataListAPI,editeClientDataAPI} = require('../api')
 
 
 const router = require('express').Router()
 
-router.get('/data/:id',exampleDataApi)
 
 
 
-router.get('/donurs',donourInfo)
+// save data to database 
+router.post('/clientListItem',ClientListItemAdd)
+
+// get data to database 
+router.get('/getClientData',getClientDataListAPI)
+
+// Define route to handle updating client data
+router.put('/eiditeClientData/:clientId', updateClientData);
+
+// deleted cliet data 
+router.delete('/deleteClientData/:clientId', deleteClientData);
 
 
 module.exports = router
