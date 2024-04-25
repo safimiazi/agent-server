@@ -1,26 +1,35 @@
 const { Customer } = require("../../models");
 
-// save clientUserData to data base 
+// save the data inside the dataebase 
 
 const saveClientData = async (data) => {
     try {
+        console.log('call the api');
         // Log client data (optional)
-        console.log('Access the server link', data);
-        
+        if (!data || Object.keys(data).length === 0 ) return {message:'Something wrong: No data provided'}; // Check if data is provided
+
+        // Check if the user already exists by uniqueId
+        const existingUser = await Customer.findOne({ uniqueId: data.uniqueId });
+
+        if (existingUser) {
+            return {message:'User with the provided uniqueId already exists in the database'} // User already exists
+        }
+
+        // Check if the customer already exists by customerName
+        const existingCustomer = await Customer.findOne({ customerName: data.customerName });
+
+        if (existingCustomer) {
+            return {message:'Customer with the provided customerName already exists in the database'}; // Customer already exists
+        }
+
         // Create a new instance of Customer model with provided data
-        const newClient = new Customer({
-            uniqueID: data.UniqueID,
-            customerName: data.CustomerName,
-            type: data.Type,
-            condition: data.Condition,
-            pointRate: data.PointRate
-        });
+        const newClient = new Customer(data);
 
         // Save the client data to the database
         const savedClient = await newClient.save();
 
         // Return saved client data
-        return savedClient;
+        return {message:'successfully insert data ',savedClient};
     } catch (error) {
         // Handle error
         console.error('Error saving client data:', error);
@@ -28,68 +37,97 @@ const saveClientData = async (data) => {
     }
 };
 
+
+//  geting all the register users 
+
+const getingAllregiserUser = async ( ) =>{
+    try{
+        const getingAllUser = (await Customer.find())
+        return getingAllUser;
+    }catch(error){return error}
+}
+
+
 // get the clientUser data and search with pagination 
 
 const getClientDataList = async(searchQuery, page = 1, pageSize = 50) =>{
     try{
         
-        // define query ovject for search criteria
-        const query = searchQuery ? {$text: {$search: searchQuery}} : {};
+        let query = {};
 
-        // calcuation skip vlue for pagination
-        const skip = (page - 1 ) * 50 ;
+        // If searchQuery is provided, construct a regex pattern to match any part of the text
+        if (searchQuery) {
+            const regex = new RegExp(searchQuery.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i');
+            query = {
+                $or: [
+                    { customerName: { $regex: regex } },
+                    { uniqueId: { $regex: regex } }
+                    // Add more fields as needed
+                ]
+            };
+        }
 
-        // Fetch client data from the database based on search criteria and pagincation 
 
-        const clientListData = await Customer.find(query).skip(skip).limit(pageSize)
+        // Calculate skip value for pagination
+        const skip = (page) * pageSize;
+
+        // Fetch client data from the database based on search criteria and pagination
+        const clientListData = await Customer.find(query ).skip(skip).limit(pageSize) // with quiery data and pagination 
+        const withOutQuery = await Customer.find().skip(skip).limit(pageSize) // without querydata list and pagination 
+        const TotalDataLenght  = (await Customer.find()).length
+
+
+        const finalliyValue = clientListData.length >  0 ? clientListData  :  withOutQuery ; 
+
         
-        return clientListData;
+
+        return { finalliyValue , TotalDataLenght };
+
 
     }catch(error){
         return error
     }
 }
+
+
 
 // edite data client list 
 
-const editeClientData = async(clientId,newClientData) =>{
-    try{
-        // find the client by thir id
-
-        const client = await Customer.findById(clientId)
-
-        // if the client don't exist trow the error 
-        if ( !client){
-            throw new Error('client no found')
-        }
-
-        // update the client data with the new data 
-
-        Object.assign(client, newClientData)
-
-        const updatedClient = await client.save();
-
-        return updatedClient;
-
-    }catch(error){
-        return error
-    }
-}
-
-// deleted the database client 
-
-const deleteClient = async (uniqueId) => {
+const editeClientData = async (clientId, newClientData) => {
     try {
-        // Find the client by their unique ID
-        const client = await Customer.findOne({ uniqueID: uniqueId });
+        // Find the client by their ID and update their data
+        const updatedClient = await Customer.findByIdAndUpdate(clientId, newClientData, { new: true });
 
-        // If the client doesn't exist, throw an error
-        if (!client) {
+        // Check if the client was found and updated
+        if (!updatedClient) {
             throw new Error('Client not found');
         }
 
-        // Delete the client from the database
-        await client.remove();
+        // Return the updated client data
+        return {message:'update data successfully ', updatedClient};
+    } catch (error) {
+        // Handle error
+        console.error('Error updating client data:', error);
+        throw error; // Rethrow error for handling at the caller level
+    }
+};
+
+
+// deleted the database client 
+
+const deleteClient = async (id) => {
+    try {
+        // Find the client by their unique ID
+        if (!id) {
+            return{message:'please provide Write data , somthing is wrong '}
+        }
+        const deletedClient = await Customer.deleteOne({_id: id})
+        console.log(deletedClient);
+        if (deletedClient.deletedCount === 0) {
+            return {message:'client not found'}
+        }
+        return {message: 'client delete successfully'}
+
     } catch (error) {
         // Handle error
         console.error('Error deleting client:', error);
@@ -99,7 +137,4 @@ const deleteClient = async (uniqueId) => {
 
 
 
-
-
-
-module.exports = { saveClientData ,getClientDataList,editeClientData};
+module.exports = { saveClientData ,getClientDataList,editeClientData,deleteClient,getingAllregiserUser};
