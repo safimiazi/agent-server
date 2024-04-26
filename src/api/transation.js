@@ -25,7 +25,8 @@ const getingDataInfomationTatal = async(req, res)=>{
     try{
         const queryValue = req.query;
         const getingFinalResult = await getingTransationTotal(queryValue)  // call the function for geting data to database 
-        res.status(2000).send({ getingFinalResult}) // send data to the frontend part 
+        console.log(getingFinalResult);
+        res.status(200).send(getingFinalResult)
 
     }catch(error){
         return error
