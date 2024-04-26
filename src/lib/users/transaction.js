@@ -5,6 +5,8 @@
 
 const { transactioListItem } = require("../../models/transaction");
 
+
+// insert all the transation data insdie the database 
 const transactionInfo = async (transation) => {
     try {
         console.log(transation);
@@ -18,7 +20,7 @@ const transactionInfo = async (transation) => {
 
         console.log(finallyInsert, 'data insert ');
 
-        return finallyInsert;
+        return {message:'successfully insert Transation data ',finallyInsert};
 
     } catch (error) {
         return error
