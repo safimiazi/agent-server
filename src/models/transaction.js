@@ -20,10 +20,13 @@ const transactionSchema = new mongoose.Schema({
   points: { type: Number, required: true },
 
   // Translation type of the transaction (required)
-  trans: { type: String, required: true },
+  trans: { type: String,  },
 
   // Phone number associated with the transaction (required)
-  number: { type: String, required: true }
+  number: { type: String,  },
+  
+  // transationType  condtion the data list 
+  transationType: {type:String}
 }, {
   // Enable timestamps for createdAt and updatedAt fields
   timestamps: { createdAt: 'createdAt' }

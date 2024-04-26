@@ -20,7 +20,7 @@ const transactionInfo = async (transation) => {
 
         console.log(finallyInsert, 'data insert ');
 
-        return {message:'successfully insert Transation data ',finallyInsert};
+        return { message: 'successfully insert Transation data ', finallyInsert };
 
     } catch (error) {
         return error
@@ -67,10 +67,14 @@ const getingTransactionInfo = async (searchQuery, page = 1, pageSize = 50) => {
         return error
     }
 }
+
+// all the transation list here 
+
+
 const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
 
-        console.log('call api ');
-    let   AllDataListSearchDefault ;
+    console.log('call api ');
+    let AllDataListSearchDefault;
 
     try {
 
@@ -141,7 +145,11 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
 
         // bydefault value search functionlity here now 
 
-         AllDataListSearchDefault = await transactioListItem.find(); // All the value geting of transation list 
+        AllDataListSearchDefault = await transactioListItem.find(); // All the value geting of transation list 
+
+        // Get today's date
+        const currentDate = new Date();
+
 
         // Initialize variables to hold the totals
         let totalAmount = 0;
@@ -149,6 +157,9 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
         let totalDeposit = 0;
         let totalWithdrawAmount = 0;
         let totalWithdrawCredit = 0;
+        let totalTransactions = 0;
+        let uniqueCustomers = 0;
+        let lastTransactionTime = null; // Variable to store the timestamp of the last transaction for today
         let totalPaymentMethod = {
             bkash: 0,
             rocket: 0,
@@ -156,6 +167,8 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
             nagod: 0,
             bank: 0
         };
+        const transactionsByCustomer = {};  // Initialize an object to store the number of transactions for each client
+        
 
         // Iterate through each transaction
         AllDataListSearchDefault.forEach(transaction => {
@@ -166,12 +179,12 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
             totalPoints += transaction.points;
 
             // Check if the transaction is a deposit and add it to the total deposit
-            if (transaction.type === 'deposit') {
+            if (transaction.transationType === 'deposit') {
                 totalDeposit += transaction.amount;
             }
 
             // Check if the transaction is a withdrawal
-            if (transaction.type === 'withdraw') {
+            if (transaction.transationType === 'withdraw') {
                 // Add the amount of each withdrawal to the total withdrawal amount
                 totalWithdrawAmount += transaction.amount;
 
@@ -179,7 +192,22 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
                 totalWithdrawCredit += transaction.points;
             }
 
-            console.log();
+            // Parse the createdAt timestamp of the transaction
+            const transactionDate = new Date(transaction.createdAt);
+
+            // Check if the transaction occurred today
+            if (transactionDate.toDateString() === currentDate.toDateString()) {
+                // Increment the transaction count for the customer
+                transactionsByCustomer[transaction.customerId] = (transactionsByCustomer[transaction.customerId] || 0) + 1;
+
+                // Update the lastTransactionTime if the transaction occurred later than the current lastTransactionTime
+                if (!lastTransactionTime || transactionDate > new Date(lastTransactionTime)) {
+                    lastTransactionTime = transactionDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
+                }
+
+            }
+
+
             // Check if the transaction payment method matches a specified method and add it to the total payment method
             if (['bkash', 'rocket', 'upay', 'nagod', 'bank'].includes(transaction.paymentType)) {
 
@@ -195,31 +223,53 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
             }
         });
 
-        // // Now you have the totals and filtered values
-        // console.log("Total Amount:", totalAmount);
-        // console.log("Total Points:", totalPoints);
-        // console.log("Total Deposit:", totalDeposit);
-        // console.log("Total Withdrawal Amount:", totalWithdrawAmount);
-        // console.log("Total Withdrawal Credit:", totalWithdrawCredit);
-        // console.log("Total Payment Method (bkash):", totalPaymentMethod.bkash);
-        // console.log("Total Payment Method (roket):", totalPaymentMethod.rocket);
-        // console.log("Total Payment Method (upay):", totalPaymentMethod.upay);
-        // console.log("Total Payment Method (nogod):", totalPaymentMethod.nagod);
-        // console.log("Total Payment Method (nogod):", totalPaymentMethod.bank);
+
+        // Iterate over each key-value pair in transactionsByCustomer
+        for (const customerId in transactionsByCustomer) {
+            // Add the count of transactions for the current customer to the totalTransactions
+            totalTransactions += transactionsByCustomer[customerId];
+            // Increment the uniqueCustomers count for each customer key
+            uniqueCustomers++;
+        }
+        // calculation Need amout Balence for see users 
+        const needAmountBalence = totalDeposit - totalWithdrawAmount;
+
+
+        // Now you have the totals and filtered values
+        console.log("Total Amount:", totalAmount);
+        console.log("Total Points:", totalPoints);
+        console.log("Total Deposit:", totalDeposit);
+        console.log("Total Withdrawal Amount:", totalWithdrawAmount);
+        console.log("Total Withdrawal Credit:", totalWithdrawCredit);
+        console.log("Total Payment Method (bkash):", totalPaymentMethod.bkash);
+        console.log("Total Payment Method (roket):", totalPaymentMethod.rocket);
+        console.log("Total Payment Method (upay):", totalPaymentMethod.upay);
+        console.log("Total Payment Method (nogod):", totalPaymentMethod.nagod);
+        console.log("Total Payment Method (nogod):", totalPaymentMethod.bank);
+        console.log("Customer Total Transation count time : ", totalTransactions);
+        console.log("Last transation time : ", lastTransactionTime);
+        console.log("unique Customer id Number ", uniqueCustomers);
+        console.log("Need Balence ", needAmountBalence);
+
+
 
         return [
-                {message:'geting a data successsfully from the database '},
-                {TotalAmount : totalAmount},
-                {TotalPoints : totalPoints},
-                {TotalDeposit : totalDeposit},
-                {TotalWithdrawalAmount : totalWithdrawAmount},
-                {TotalWithdrawalCredit : totalWithdrawCredit},
-                {TotalPaymentMethodbkash : totalPaymentMethod.bkash},
-                {TotalPaymentMethodRoket : totalPaymentMethod.rocket},
-                {TotalPaymentMethodUpay : totalPaymentMethod.upay},
-                {TotalPaymentMethodNogod : totalPaymentMethod.nagod},
-                {TotalPaymentMethodBank : totalPaymentMethod.bank}
-            ]
+            { message: 'geting a data successsfully from the database ' },
+            { TotalAmount: totalAmount },
+            { TotalPoints: totalPoints },
+            { TotalDeposit: totalDeposit },
+            { TotalWithdrawalAmount: totalWithdrawAmount },
+            { TotalWithdrawalCredit: totalWithdrawCredit },
+            { TotalPaymentMethodbkash: totalPaymentMethod.bkash },
+            { TotalPaymentMethodRoket: totalPaymentMethod.rocket },
+            { TotalPaymentMethodUpay: totalPaymentMethod.upay },
+            { TotalPaymentMethodNogod: totalPaymentMethod.nagod },
+            { TotalPaymentMethodBank: totalPaymentMethod.bank },
+            {TotalTransationToday : totalTransactions },
+            {TodayLastTimeTransation : lastTransactionTime},
+            {NeedBalenceWD: needAmountBalence }
+        ]
+
 
     } catch (error) {
         // Handle any errors
