@@ -71,9 +71,9 @@ const getingTransactionInfo = async (searchQuery, page = 1, pageSize = 50) => {
 // all the transation list here 
 
 
-const getingTransationTotal = async (days ) => {
+const getingTransationTotal = async (days) => {
 
-    const convertArray = [...days.search,days.search]
+    const convertArray = [...days.search, days.search]
     // Filter out search values that match predefined dates
     const storeDate = ['today', 'fastWeek', 'last-week', 'this-month', 'last-month'];
     const searchDateValues = convertArray.filter(item => storeDate.includes(item));
@@ -83,22 +83,29 @@ const getingTransationTotal = async (days ) => {
 
     // set variable for search functionlity 
 
-    const fildSearchValue = searchFieldValues[searchFieldValues.length - 1] ;
-    const dayTimeSearchValue = searchDateValues[0] ;
-    
+    const fildSearchValue = searchFieldValues.includes('undefined') || searchFieldValues.includes(undefined)
+        ? undefined
+        : searchFieldValues[searchFieldValues.length - 1];
+
+    // Check if 'undefined' exists in searchDateValues
+    const dayTimeSearchValue = searchDateValues.includes('undefined') || searchDateValues.includes(undefined)
+        ? undefined
+        : searchDateValues[0];
+
 
     console.log("Search Date Values:", searchDateValues[0]);
     console.log("Search Field Values:", searchFieldValues[searchFieldValues.length - 1]);
-    
 
-    
+    console.log(typeof (dayTimeSearchValue), typeof (fildSearchValue), fildSearchValue, dayTimeSearchValue);
+
+
     let AllDataListSearchDefault;
 
     try {
 
         let startDate, endDate; // search by date range 
-        console.log(days, 'value check ');
-        if (dayTimeSearchValue !== 'undefined' && dayTimeSearchValue) {
+
+        if (dayTimeSearchValue && dayTimeSearchValue.length > 1) {
 
             const currentDate = new Date();
             const timeRange = dayTimeSearchValue
@@ -151,21 +158,33 @@ const getingTransationTotal = async (days ) => {
 
         // here now searchQuery functionlity 
 
-        if (fildSearchValue !== 'undefined' && fildSearchValue ) {
+        if (fildSearchValue && fildSearchValue.length > 1) {
+
+            console.log('access the customer id ');
             // Fetch data based on searchQuery and time range
-            const NameSearchValue = await transactioListItem.find({ customerId: days?.searchfild }); // search by customer id 
-            AllDataListSearchDefault = NameSearchValue
+            const NameSearchValue = await transactioListItem.findOne({ customerId: fildSearchValue }); // search by customer id 
+            let allDataArray = []; // Initialize an empty array
+
+            if (NameSearchValue) {
+                // If a document is found, push it into the array
+                allDataArray.push(NameSearchValue);
+            }
+            AllDataListSearchDefault = allDataArray;
 
         }
 
+        if (!dayTimeSearchValue && !fildSearchValue) {
+            // bydefault value search functionlity here now 
 
-        // bydefault value search functionlity here now 
+            AllDataListSearchDefault = await transactioListItem.find(); // All the value geting of transation list 
+        }
 
-        AllDataListSearchDefault = await transactioListItem.find(); // All the value geting of transation list 
 
         // Get today's date
         const currentDate = new Date();
 
+
+        console.log(AllDataListSearchDefault.length);
 
         // Initialize variables to hold the totals
         let totalAmount = 0;
@@ -184,7 +203,7 @@ const getingTransationTotal = async (days ) => {
             bank: 0
         };
         const transactionsByCustomer = {};  // Initialize an object to store the number of transactions for each client
-        
+
 
         // Iterate through each transaction
         AllDataListSearchDefault.forEach(transaction => {
@@ -281,10 +300,10 @@ const getingTransationTotal = async (days ) => {
             { TotalPaymentMethodUpay: totalPaymentMethod.upay },
             { TotalPaymentMethodNogod: totalPaymentMethod.nagod },
             { TotalPaymentMethodBank: totalPaymentMethod.bank },
-            {TotalTransationToday : totalTransactions },
-            {TodayLastTimeTransation : lastTransactionTime},
-            {NeedBalenceWD: needAmountBalence },
-            {uniqueCustomers : uniqueCustomers}
+            { TotalTransationToday: totalTransactions },
+            { TodayLastTimeTransation: lastTransactionTime },
+            { NeedBalenceWD: needAmountBalence },
+            { uniqueCustomers: uniqueCustomers }
         ]
 
 
