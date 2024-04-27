@@ -98,7 +98,7 @@ const getingTransationTotal = async (days ) => {
 
         let startDate, endDate; // search by date range 
         console.log(days, 'value check ');
-        if (dayTimeSearchValue !== 'undefined') {
+        if (dayTimeSearchValue !== 'undefined' && dayTimeSearchValue) {
 
             const currentDate = new Date();
             const timeRange = dayTimeSearchValue
@@ -151,7 +151,7 @@ const getingTransationTotal = async (days ) => {
 
         // here now searchQuery functionlity 
 
-        if (fildSearchValue !== 'undefined' ) {
+        if (fildSearchValue !== 'undefined' && fildSearchValue ) {
             // Fetch data based on searchQuery and time range
             const NameSearchValue = await transactioListItem.find({ customerId: days?.searchfild }); // search by customer id 
             AllDataListSearchDefault = NameSearchValue
