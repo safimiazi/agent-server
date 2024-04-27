@@ -73,17 +73,35 @@ const getingTransactionInfo = async (searchQuery, page = 1, pageSize = 50) => {
 
 const getingTransationTotal = async (days ) => {
 
-    console.log('call api ');
+    const convertArray = [...days.search,days.search]
+    // Filter out search values that match predefined dates
+    const storeDate = ['today', 'fastWeek', 'last-week', 'this-month', 'last-month'];
+    const searchDateValues = convertArray.filter(item => storeDate.includes(item));
+
+    // Filter out search values that don't match predefined dates
+    const searchFieldValues = convertArray.filter(item => !storeDate.includes(item));
+
+    // set variable for search functionlity 
+
+    const fildSearchValue = searchFieldValues[searchFieldValues.length - 1] ;
+    const dayTimeSearchValue = searchDateValues[0] ;
+    
+
+    console.log("Search Date Values:", searchDateValues[0]);
+    console.log("Search Field Values:", searchFieldValues[searchFieldValues.length - 1]);
+    
+
+    
     let AllDataListSearchDefault;
 
     try {
 
         let startDate, endDate; // search by date range 
         console.log(days, 'value check ');
-        if (days.search !== 'undefined') {
+        if (dayTimeSearchValue !== 'undefined') {
 
             const currentDate = new Date();
-            const timeRange = days.day;
+            const timeRange = dayTimeSearchValue
 
             switch (timeRange) {
                 case 'today':
@@ -133,7 +151,7 @@ const getingTransationTotal = async (days ) => {
 
         // here now searchQuery functionlity 
 
-        if (searchQuery) {
+        if (fildSearchValue !== 'undefined' ) {
             // Fetch data based on searchQuery and time range
             const NameSearchValue = await transactioListItem.find({ customerId: days?.searchfild }); // search by customer id 
             AllDataListSearchDefault = NameSearchValue
