@@ -83,7 +83,7 @@ const getingTransationTotal = async (days ) => {
         if (days.search !== 'undefined') {
 
             const currentDate = new Date();
-            const timeRange = days.search;
+            const timeRange = days.day;
 
             switch (timeRange) {
                 case 'today':
@@ -135,7 +135,7 @@ const getingTransationTotal = async (days ) => {
 
         if (searchQuery) {
             // Fetch data based on searchQuery and time range
-            const NameSearchValue = await transactioListItem.find({ customerId: days?.searchQuery }); // search by customer id 
+            const NameSearchValue = await transactioListItem.find({ customerId: days?.searchfild }); // search by customer id 
             AllDataListSearchDefault = NameSearchValue
 
         }
