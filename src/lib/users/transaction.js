@@ -71,7 +71,7 @@ const getingTransactionInfo = async (searchQuery, page = 1, pageSize = 50) => {
 // all the transation list here 
 
 
-const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
+const getingTransationTotal = async (days ) => {
 
     console.log('call api ');
     let AllDataListSearchDefault;
@@ -128,8 +128,6 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
 
             AllDataListSearchDefault = searchByTimes
 
-
-
         }
 
 
@@ -137,7 +135,7 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
 
         if (searchQuery) {
             // Fetch data based on searchQuery and time range
-            const NameSearchValue = await transactioListItem.find({ customerId: searchQuery }); // search by customer id 
+            const NameSearchValue = await transactioListItem.find({ customerId: days?.searchQuery }); // search by customer id 
             AllDataListSearchDefault = NameSearchValue
 
         }
@@ -267,7 +265,8 @@ const getingTransationTotal = async (days, searchQuery = 'Customer2') => {
             { TotalPaymentMethodBank: totalPaymentMethod.bank },
             {TotalTransationToday : totalTransactions },
             {TodayLastTimeTransation : lastTransactionTime},
-            {NeedBalenceWD: needAmountBalence }
+            {NeedBalenceWD: needAmountBalence },
+            {uniqueCustomers : uniqueCustomers}
         ]
 
 
