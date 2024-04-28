@@ -1,6 +1,4 @@
 
-
-
 // insert data to the database 
 
 const { transactioListItem } = require("../../models/transaction");

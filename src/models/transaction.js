@@ -26,15 +26,13 @@ const transactionSchema = new mongoose.Schema({
   number: { type: String,  },
   
   // transationType  condtion the data list 
-  transationType: {type:String}
-}, {
-  // Enable timestamps for createdAt and updatedAt fields
-  timestamps: { createdAt: 'createdAt' }
+  transationType: {type:String},
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: 5356800  // 62 days in milliseconds
+  }
 });
-
-
-// Create an index on the createdAt field for automatic expiration
-transactionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 5356800 });
 
 // Create a Mongoose model based on the schema
 const transactioListItem = mongoose.model('transaction', transactionSchema);
