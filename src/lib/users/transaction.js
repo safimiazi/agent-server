@@ -194,7 +194,6 @@ const getingTransationTotal = async (days) => {
         let totalDepositCredite = 0;
         let dopsiteTransactions = 0;
         let dopositeUniqueCustomers = 0;
-        let dopsiteUniqueCustomers = 0;
         let dopsiteTransactionTime = null; // Variable to store the timestamp of the last transaction for today
         const DopositetransactionsByCustomer = {};  // Initialize an object to store the number of transactions for each client
         let totalDopositePaymentMethod = {
@@ -333,6 +332,8 @@ const getingTransationTotal = async (days) => {
 
         const remainAmounts = totalDepositAmount - totalWithdrawAmount ; // total remain amount 
         const remainPoints  = totalDepositCredite - totalWithdrawCredit  // total remain point 
+        const TotalDopositeAmount = remainAmounts ;
+        const totalDopositePoints = remainPoints ;
 
 
 
@@ -340,8 +341,8 @@ const getingTransationTotal = async (days) => {
         // Log total deposite information
         console.log('Total amount:', totalAmount);
         console.log('Total points:', totalPoints);
-        console.log('Total deposite amount:', totalDepositAmount);
-        console.log('Total deposite credit:', totalDepositCredite);
+        console.log('Total deposite amount:', remainAmounts);
+        console.log('Total deposite credit:', remainPoints);
         console.log('Total deposite transactions:', dopsiteTransactions);
         console.log('Total deposite unique customers:', dopositeUniqueCustomers);
         console.log('Last deposite transaction time:', dopsiteTransactionTime);
@@ -359,14 +360,14 @@ const getingTransationTotal = async (days) => {
         console.log('Total Remaining amounts ',remainAmounts );
         console.log('toal remain points ', remainPoints);
 
-
-
         return {
             message: 'succesfully geting data from server api ',
             remainAmounts,
+            totalAmount,
+            totalPoints,
             remainPoints,
-            totalDepositAmount,
-            totalDepositCredite,
+            TotalDopositeAmount,
+            totalDopositePoints,
             dopsiteTransactions,
             dopositeUniqueCustomers,
             dopsiteTransactionTime,
