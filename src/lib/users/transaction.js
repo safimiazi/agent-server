@@ -158,18 +158,19 @@ const getingTransationTotal = async (days) => {
 
         // here now searchQuery functionlity 
 
-        if (fildSearchValue && fildSearchValue.length > 1) {
+        if (fildSearchValue && fildSearchValue.length > 0) {
 
             console.log('access the customer id ');
             // Fetch data based on searchQuery and time range
-            const NameSearchValue = await transactioListItem.findOne({ customerId: fildSearchValue }); // search by customer id 
-            let allDataArray = []; // Initialize an empty array
+            const NameSearchValue = await transactioListItem.find({ customerId: fildSearchValue }); // search by customer id 
+            // let allDataArray = []; // Initialize an empty array
 
-            if (NameSearchValue) {
-                // If a document is found, push it into the array
-                allDataArray.push(NameSearchValue);
-            }
-            AllDataListSearchDefault = allDataArray;
+            // if (NameSearchValue) {
+            //     // If a document is found, push it into the array
+            //     allDataArray.push(NameSearchValue);
+            // }
+            console.log(NameSearchValue , 'acccess the user search');
+            AllDataListSearchDefault = NameSearchValue;
 
         }
 
@@ -184,7 +185,7 @@ const getingTransationTotal = async (days) => {
         const currentDate = new Date();
 
 
-        console.log(AllDataListSearchDefault.length);
+        console.log(AllDataListSearchDefault);
 
         // all the data deposite  store here , for sending database or calculcation 
         let totalAmount = 0;

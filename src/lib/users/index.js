@@ -100,7 +100,7 @@ const editeClientData = async (clientId, newClientData) => {
 
         console.log(clientId, newClientData);
 
-        if(!clientId ){
+        if(clientId === 'undefined' || !clientId || Object.entries(newClientData).length < 1 ){
             return{message:'Please provide Right Data '}
         }
         // Find the client by their ID and update their data
