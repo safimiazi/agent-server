@@ -73,7 +73,7 @@ const getingTransactionInfo = async (searchQuery, page = 1, pageSize = 50) => {
 
 const getingTransationTotal = async (days) => {
 
-    const convertArray = [...days.search, days.search]
+    const convertArray = [...days?.search, days?.search];
     // Filter out search values that match predefined dates
     const storeDate = ['today', 'fastWeek', 'last-week', 'this-month', 'last-month'];
     const searchDateValues = convertArray.filter(item => storeDate.includes(item));
@@ -93,10 +93,7 @@ const getingTransationTotal = async (days) => {
         : searchDateValues[0];
 
 
-    console.log("Search Date Values:", searchDateValues[0]);
-    console.log("Search Field Values:", searchFieldValues[searchFieldValues.length - 1]);
-
-    console.log(typeof (dayTimeSearchValue), typeof (fildSearchValue), fildSearchValue, dayTimeSearchValue);
+    console.log(typeof (dayTimeSearchValue), typeof (fildSearchValue), fildSearchValue, dayTimeSearchValue , 'check the everythink');
 
 
     let AllDataListSearchDefault;
@@ -105,7 +102,7 @@ const getingTransationTotal = async (days) => {
 
         let startDate, endDate; // search by date range 
 
-        if (dayTimeSearchValue && dayTimeSearchValue.length > 1) {
+        if (dayTimeSearchValue) {
 
             const currentDate = new Date();
             const timeRange = dayTimeSearchValue
@@ -142,23 +139,28 @@ const getingTransationTotal = async (days) => {
                     throw new Error('Invalid timeRange');
             }
 
-            // make functionlity for all the calculation for work 
 
-            const searchByTimes = await transactioListItem.find({
+            console.log(startDate,'stard data ');
+            console.log('end data ', endDate);
+
+            // make functionlity for all the calculation for work 
+            const searchByTotimes = await transactioListItem.find({
                 createdAt: {
                     $gte: startDate,
                     $lte: endDate
                 }
-            })
+            });
 
-            AllDataListSearchDefault = searchByTimes
+            console.log(searchByTotimes,'check data in weekly search ');
+
+            AllDataListSearchDefault = searchByTotimes
 
         }
 
 
         // here now searchQuery functionlity 
 
-        if (fildSearchValue && fildSearchValue.length > 0) {
+        if (fildSearchValue && fildSearchValue.length > 1) {
 
             console.log('access the customer id ');
             // Fetch data based on searchQuery and time range
@@ -180,12 +182,11 @@ const getingTransationTotal = async (days) => {
             AllDataListSearchDefault = await transactioListItem.find(); // All the value geting of transation list 
         }
 
+        console.log(AllDataListSearchDefault,'check the search value');
+
 
         // Get today's date
         const currentDate = new Date();
-
-
-        console.log(AllDataListSearchDefault);
 
         // all the data deposite  store here , for sending database or calculcation 
         let totalAmount = 0;

@@ -34,7 +34,7 @@ const transactionSchema = new mongoose.Schema({
 
 
 // Create an index on the createdAt field for automatic expiration
-transactionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 300 });
+transactionSchema.index({ createdAt: 1 }, { expireAfterSeconds: 5356800 });
 
 // Create a Mongoose model based on the schema
 const transactioListItem = mongoose.model('transaction', transactionSchema);

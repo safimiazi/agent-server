@@ -28,7 +28,7 @@ const customerSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: 2592000000 // 30 days in milliseconds
+        expires: 5356800 // 30 days in milliseconds
     }
 });
 
