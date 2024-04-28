@@ -5,6 +5,8 @@ const { Customer } = require("../../models");
 const saveClientData = async (data) => {
     try {
         console.log('call the api');
+        console.log(data, 'check the data list ');
+
         // Log client data (optional)
         if (!data || Object.keys(data).length === 0 ) return {message:'Something wrong: No data provided'}; // Check if data is provided
 
@@ -95,6 +97,12 @@ const getClientDataList = async(searchQuery, page = 1, pageSize = 50) =>{
 
 const editeClientData = async (clientId, newClientData) => {
     try {
+
+        console.log(clientId, newClientData);
+
+        if(!clientId ){
+            return{message:'Please provide Right Data '}
+        }
         // Find the client by their ID and update their data
         const updatedClient = await Customer.findByIdAndUpdate(clientId, newClientData, { new: true });
 

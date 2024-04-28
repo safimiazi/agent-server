@@ -186,27 +186,46 @@ const getingTransationTotal = async (days) => {
 
         console.log(AllDataListSearchDefault.length);
 
-        // Initialize variables to hold the totals
+        // all the data deposite  store here , for sending database or calculcation 
         let totalAmount = 0;
         let totalPoints = 0;
-        let totalDeposit = 0;
-        let totalWithdrawAmount = 0;
-        let totalWithdrawCredit = 0;
-        let totalTransactions = 0;
-        let uniqueCustomers = 0;
-        let lastTransactionTime = null; // Variable to store the timestamp of the last transaction for today
-        let totalPaymentMethod = {
+        let totalDepositAmount = 0;
+        let totalDepositCredite = 0;
+        let dopsiteTransactions = 0;
+        let dopositeUniqueCustomers = 0;
+        let dopsiteUniqueCustomers = 0;
+        let dopsiteTransactionTime = null; // Variable to store the timestamp of the last transaction for today
+        const DopositetransactionsByCustomer = {};  // Initialize an object to store the number of transactions for each client
+        let totalDopositePaymentMethod = {
             bkash: 0,
             rocket: 0,
             upay: 0,
             nagod: 0,
             bank: 0
         };
-        const transactionsByCustomer = {};  // Initialize an object to store the number of transactions for each client
+
+        // total withdraw infomation here for sending to frontend and calculation 
+        let totalWithdrawAmount = 0;
+        let totalWithdrawCredit = 0;
+        let withdrawUniqueCustomers = 0;
+        let withdrawTransactions = 0;
+        let withdrawTransactionTime = null; // Variable to store the timestamp of the last transaction for today
+        const withDrawtransactionsByCustomer = {};
+        let totalWithDrawPaymentMethod = {
+            bkash: 0,
+            rocket: 0,
+            upay: 0,
+            nagod: 0,
+            bank: 0
+        };
+
 
 
         // Iterate through each transaction
         AllDataListSearchDefault.forEach(transaction => {
+
+            // Parse the createdAt timestamp of the transaction
+            const transactionDate = new Date(transaction.createdAt);
             // Add the amount of each transaction to the total amount
             totalAmount += transaction.amount;
 
@@ -214,98 +233,152 @@ const getingTransationTotal = async (days) => {
             totalPoints += transaction.points;
 
             // Check if the transaction is a deposit and add it to the total deposit
-            if (transaction.transationType === 'deposit') {
-                totalDeposit += transaction.amount;
+            if (transaction.transationType === 'Deposit') {
+                totalDepositAmount += transaction.amount;
+                totalDepositCredite += transaction.points;
+
+                // Check if the transaction occurred today
+                if (transactionDate.toDateString() === currentDate.toDateString()) {
+                    // Increment the transaction count for the customer
+                    DopositetransactionsByCustomer[transaction.customerId] = (DopositetransactionsByCustomer[transaction.customerId] || 0) + 1;
+
+                    // Update the lastTransactionTime if the transaction occurred later than the current lastTransactionTime
+                    if (!dopsiteTransactionTime || transactionDate > new Date(dopsiteTransactionTime)) {
+                        dopsiteTransactionTime = transactionDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
+                    }
+
+                }
+
+
+                // Check if the transaction payment method matches a specified method and add it to the total payment method
+                if (['bkash', 'rocket', 'upay', 'nagod', 'bank'].includes(transaction.paymentType)) {
+
+                    // Check if the property exists in the totalPaymentMethod object
+                    if (totalDopositePaymentMethod.hasOwnProperty(transaction.paymentType)) {
+                        // If the property exists, add the transaction amount to it
+                        totalDopositePaymentMethod[transaction.paymentType] += transaction.amount;
+
+                    } else {
+                        // If the property doesn't exist, initialize it to 0 and then add the transaction amount
+                        totalDopositePaymentMethod[transaction.paymentType] = transaction.amount;
+                    }
+                }
+
             }
 
             // Check if the transaction is a withdrawal
-            if (transaction.transationType === 'withdraw') {
+            if (transaction.transationType === 'Withdraw') {
                 // Add the amount of each withdrawal to the total withdrawal amount
                 totalWithdrawAmount += transaction.amount;
 
                 // Add the credit of each withdrawal to the total withdrawal credit
                 totalWithdrawCredit += transaction.points;
-            }
 
-            // Parse the createdAt timestamp of the transaction
-            const transactionDate = new Date(transaction.createdAt);
+                // Check if the transaction occurred today
+                if (transactionDate.toDateString() === currentDate.toDateString()) {
+                    // Increment the transaction count for the customer
+                    withDrawtransactionsByCustomer[transaction.customerId] = (withDrawtransactionsByCustomer[transaction.customerId] || 0) + 1;
 
-            // Check if the transaction occurred today
-            if (transactionDate.toDateString() === currentDate.toDateString()) {
-                // Increment the transaction count for the customer
-                transactionsByCustomer[transaction.customerId] = (transactionsByCustomer[transaction.customerId] || 0) + 1;
+                    // Update the lastTransactionTime if the transaction occurred later than the current lastTransactionTime
+                    if (!withdrawTransactionTime || transactionDate > new Date(withdrawTransactionTime)) {
+                        withdrawTransactionTime = transactionDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
+                    }
 
-                // Update the lastTransactionTime if the transaction occurred later than the current lastTransactionTime
-                if (!lastTransactionTime || transactionDate > new Date(lastTransactionTime)) {
-                    lastTransactionTime = transactionDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' });
                 }
 
-            }
 
+                // Check if the transaction payment method matches a specified method and add it to the total payment method
+                if (['bkash', 'rocket', 'upay', 'nagod', 'bank'].includes(transaction.paymentType)) {
 
-            // Check if the transaction payment method matches a specified method and add it to the total payment method
-            if (['bkash', 'rocket', 'upay', 'nagod', 'bank'].includes(transaction.paymentType)) {
+                    // Check if the property exists in the totalPaymentMethod object
+                    if (totalWithDrawPaymentMethod.hasOwnProperty(transaction.paymentType)) {
+                        // If the property exists, add the transaction amount to it
+                        totalWithDrawPaymentMethod[transaction.paymentType] += transaction.amount;
 
-                // Check if the property exists in the totalPaymentMethod object
-                if (totalPaymentMethod.hasOwnProperty(transaction.paymentType)) {
-                    // If the property exists, add the transaction amount to it
-                    totalPaymentMethod[transaction.paymentType] += transaction.amount;
-
-                } else {
-                    // If the property doesn't exist, initialize it to 0 and then add the transaction amount
-                    totalPaymentMethod[transaction.paymentType] = transaction.amount;
+                    } else {
+                        // If the property doesn't exist, initialize it to 0 and then add the transaction amount
+                        totalWithDrawPaymentMethod[transaction.paymentType] = transaction.amount;
+                    }
                 }
+
+
+
             }
         });
 
-
-        // Iterate over each key-value pair in transactionsByCustomer
-        for (const customerId in transactionsByCustomer) {
-            // Add the count of transactions for the current customer to the totalTransactions
-            totalTransactions += transactionsByCustomer[customerId];
-            // Increment the uniqueCustomers count for each customer key
-            uniqueCustomers++;
+        if (DopositetransactionsByCustomer) {
+            // Iterate over each key-value pair in transactionsByCustomer
+            for (const customerId in DopositetransactionsByCustomer) {
+                // Add the count of transactions for the current customer to the totalTransactions
+                dopsiteTransactions += DopositetransactionsByCustomer[customerId];
+                // Increment the uniqueCustomers count for each customer key
+                dopositeUniqueCustomers++;
+            }
         }
-        // calculation Need amout Balence for see users 
-        const needAmountBalence = totalDeposit - totalWithdrawAmount;
+
+
+        if (withDrawtransactionsByCustomer) {
+            // Iterate over each key-value pair in transactionsByCustomer
+            for (const customerId in withDrawtransactionsByCustomer) {
+                // Add the count of transactions for the current customer to the totalTransactions
+                withdrawTransactions += withDrawtransactionsByCustomer[customerId];
+                // Increment the uniqueCustomers count for each customer key
+                withdrawUniqueCustomers++;
+            }
+        }
+
+
+        // Calculation the totalWidraw - dopsite and dopsite - withdraw
+
+        const remainAmounts = totalDepositAmount - totalWithdrawAmount ; // total remain amount 
+        const remainPoints  = totalDepositCredite - totalWithdrawCredit  // total remain point 
+
 
 
         // Now you have the totals and filtered values
-        console.log("Total Amount:", totalAmount);
-        console.log("Total Points:", totalPoints);
-        console.log("Total Deposit:", totalDeposit);
-        console.log("Total Withdrawal Amount:", totalWithdrawAmount);
-        console.log("Total Withdrawal Credit:", totalWithdrawCredit);
-        console.log("Total Payment Method (bkash):", totalPaymentMethod.bkash);
-        console.log("Total Payment Method (roket):", totalPaymentMethod.rocket);
-        console.log("Total Payment Method (upay):", totalPaymentMethod.upay);
-        console.log("Total Payment Method (nogod):", totalPaymentMethod.nagod);
-        console.log("Total Payment Method (nogod):", totalPaymentMethod.bank);
-        console.log("Customer Total Transation count time : ", totalTransactions);
-        console.log("Last transation time : ", lastTransactionTime);
-        console.log("unique Customer id Number ", uniqueCustomers);
-        console.log("Need Balence ", needAmountBalence);
+        // Log total deposite information
+        console.log('Total amount:', totalAmount);
+        console.log('Total points:', totalPoints);
+        console.log('Total deposite amount:', totalDepositAmount);
+        console.log('Total deposite credit:', totalDepositCredite);
+        console.log('Total deposite transactions:', dopsiteTransactions);
+        console.log('Total deposite unique customers:', dopositeUniqueCustomers);
+        console.log('Last deposite transaction time:', dopsiteTransactionTime);
+        console.log('Deposite transactions by customer:', DopositetransactionsByCustomer);
+        console.log('Total deposite payment method:', totalDopositePaymentMethod);
+
+        // Log total withdraw information
+        console.log('Total withdraw amount:', totalWithdrawAmount);
+        console.log('Total withdraw credit:', totalWithdrawCredit);
+        console.log('Total withdraw unique customers:', withdrawUniqueCustomers);
+        console.log('Total withdraw transactions:', withdrawTransactions);
+        console.log('Last withdraw transaction time:', withdrawTransactionTime);
+        console.log('Withdraw transactions by customer:', withDrawtransactionsByCustomer);
+        console.log('Total withdraw payment method:', totalWithDrawPaymentMethod);
+        console.log('Total Remaining amounts ',remainAmounts );
+        console.log('toal remain points ', remainPoints);
 
 
 
-        return [
-            { message: 'geting a data successsfully from the database ' },
-            { TotalAmount: totalAmount },
-            { TotalPoints: totalPoints },
-            { TotalDeposit: totalDeposit },
-            { TotalWithdrawalAmount: totalWithdrawAmount },
-            { TotalWithdrawalCredit: totalWithdrawCredit },
-            { TotalPaymentMethodbkash: totalPaymentMethod.bkash },
-            { TotalPaymentMethodRoket: totalPaymentMethod.rocket },
-            { TotalPaymentMethodUpay: totalPaymentMethod.upay },
-            { TotalPaymentMethodNogod: totalPaymentMethod.nagod },
-            { TotalPaymentMethodBank: totalPaymentMethod.bank },
-            { TotalTransationToday: totalTransactions },
-            { TodayLastTimeTransation: lastTransactionTime },
-            { NeedBalenceWD: needAmountBalence },
-            { uniqueCustomers: uniqueCustomers }
-        ]
-
+        return {
+            message: 'succesfully geting data from server api ',
+            remainAmounts,
+            remainPoints,
+            totalDepositAmount,
+            totalDepositCredite,
+            dopsiteTransactions,
+            dopositeUniqueCustomers,
+            dopsiteTransactionTime,
+            DopositetransactionsByCustomer,
+            totalDopositePaymentMethod,
+            totalWithdrawAmount,
+            totalWithdrawCredit,
+            withdrawUniqueCustomers,
+            withdrawTransactions,
+            withdrawTransactionTime,
+            withDrawtransactionsByCustomer,
+            totalWithDrawPaymentMethod
+        };
 
     } catch (error) {
         // Handle any errors
