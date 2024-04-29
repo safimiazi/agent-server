@@ -31,7 +31,7 @@ const transactionInfo = async (transation) => {
 const getingTransactionInfo = async (searchQuery, page = 1, pageSize = 50) => {
     try {
         let query = {};
-
+return;
         // If searchQuery is provided, construct a regex pattern to match any part of the text
         if (searchQuery) {
             const regex = new RegExp(searchQuery.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i');
